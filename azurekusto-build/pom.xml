@@ -47,7 +47,7 @@
                     <moduleId>com.microsoft.opensource.cla.ignition.azurekusto</moduleId>
                     <moduleName>${project.parent.name}</moduleName>
                     <moduleDescription>${project.description}</moduleDescription>
-                    <moduleVersion>2.0.0</moduleVersion>
+                    <moduleVersion>2.0.0.2020091801</moduleVersion>
                     <requiredIgnitionVersion>8.0.14</requiredIgnitionVersion>
                     <freeModule>true</freeModule>
 
