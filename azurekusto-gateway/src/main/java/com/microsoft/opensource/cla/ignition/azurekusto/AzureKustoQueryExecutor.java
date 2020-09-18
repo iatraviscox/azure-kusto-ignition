@@ -186,7 +186,7 @@ public class AzureKustoQueryExecutor implements HistoryQueryExecutor {
                             " Value:" + value +
                             " timestamp:" + timestamp);
 
-            tags.get(tag).getProcessedHistoryTag().put(new BasicQualifiedValue(value, DataQuality.fromIntValue(quality), new Date(timestamp.getTime())));
+            tags.get(tag).getProcessedHistoryTag().put(new BasicQualifiedValue(value, QualityCode.getQualityFor(quality), new Date(timestamp.getTime())));
             if (timestamp.getTime() > maxTSInData) {
                 maxTSInData = timestamp.getTime();
             }
