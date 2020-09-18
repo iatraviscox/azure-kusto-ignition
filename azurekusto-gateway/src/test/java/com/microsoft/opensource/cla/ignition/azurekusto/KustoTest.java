@@ -1,51 +1,42 @@
 package com.microsoft.opensource.cla.ignition.azurekusto;
+
 import com.inductiveautomation.ignition.common.QualifiedPath;
 import com.inductiveautomation.ignition.common.WellKnownPathTypes;
 import com.inductiveautomation.ignition.common.browsing.BrowseFilter;
-import com.inductiveautomation.ignition.common.browsing.BrowseResults;
 import com.inductiveautomation.ignition.common.browsing.Result;
-import com.inductiveautomation.ignition.common.sqltags.history.TagHistoryQueryParams;
-import com.inductiveautomation.ignition.gateway.model.GatewayContext;
+import com.inductiveautomation.ignition.common.browsing.Results;
 import com.inductiveautomation.ignition.gateway.sqltags.history.query.ColumnQueryDefinition;
 import com.inductiveautomation.ignition.gateway.sqltags.history.query.HistoryNode;
 import com.inductiveautomation.ignition.gateway.sqltags.history.query.QueryController;
-import com.microsoft.azure.kusto.data.*;
-import com.microsoft.azure.kusto.data.exceptions.DataClientException;
-import com.microsoft.azure.kusto.data.exceptions.DataServiceException;
-import com.microsoft.azure.kusto.ingest.exceptions.IngestionClientException;
-import com.microsoft.azure.kusto.ingest.exceptions.IngestionServiceException;
+import com.microsoft.azure.kusto.data.ClientImpl;
+import com.microsoft.azure.kusto.data.ConnectionStringBuilder;
+import com.microsoft.azure.kusto.data.KustoOperationResult;
+import com.microsoft.azure.kusto.data.KustoResultSetTable;
 import org.joda.time.DateTime;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDate;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
-public class KustoTest{
-    private static void PrintResults(BrowseResults<com.inductiveautomation.ignition.common.browsing.Result> results)
-    {
-        for (com.inductiveautomation.ignition.common.browsing.Result result : results.getResults())
-        {
+public class KustoTest {
+    private static void PrintResults(Results<com.inductiveautomation.ignition.common.browsing.Result> results) {
+        for (com.inductiveautomation.ignition.common.browsing.Result result : results.getResults()) {
             System.out.println(
-                "path:" + result.getPath() +
-                " display path:" + result.getDisplayPath() +
-                " type:" + result.getType() +
-                " children:" + result.hasChildren());
+                    "path:" + result.getPath() +
+                            " display path:" + result.getDisplayPath() +
+                            " type:" + result.getType() +
+                            " children:" + result.hasChildren());
         }
     }
 
     public static void main(String[] args) throws Exception {
 
         // Ingest test without context
-        String clusterName = System.getProperty("cluster","https://ignitionadxpoc.eastus.kusto.windows.net");
-        String databaseName = System.getProperty("database","Contoso");
+        String clusterName = System.getProperty("cluster", "https://ignitionadxpoc.eastus.kusto.windows.net");
+        String databaseName = System.getProperty("database", "Contoso");
         String appId = System.getProperty("appId");
         String appKey = System.getProperty("appKey");
         String appTenant = System.getProperty("appTenant");
@@ -62,8 +53,8 @@ public class KustoTest{
         AzureKustoHistorySink kusto = new AzureKustoHistorySink("kusto", null, settings);
         kusto.startup();
         ArrayList<AzureKustoTagValue> recs = new ArrayList<>();
-        AzureKustoTag tag = new AzureKustoTag("kustoIgnitoin", "ohad and uri","toKusto");
-        AzureKustoTagValue tagValue = new AzureKustoTagValue(tag, new Object(){
+        AzureKustoTag tag = new AzureKustoTag("kustoIgnitoin", "ohad and uri", "toKusto");
+        AzureKustoTagValue tagValue = new AzureKustoTagValue(tag, new Object() {
             public String name = "travis";
             public int x = 1;
         }, new Date(), 1000000);
@@ -84,7 +75,7 @@ public class KustoTest{
 
         BrowseFilter browseFilter = new BrowseFilter();
 
-        BrowseResults<com.inductiveautomation.ignition.common.browsing.Result> browsResults = null;
+        Results<Result> browsResults = null;
 
         QualifiedPath qp = builder.build();
         browsResults = provider.browse(qp, browseFilter);
@@ -141,9 +132,8 @@ public class KustoTest{
 
         kustoExecutor.startReading();
 
-        for (HistoryNode hn : kustoExecutor.getColumnNodes())
-        {
-            System.out.println("Found record: " + hn.getName() + " type: " + hn.getDataType() + " value:" + hn.getValue(0,0) );
+        for (HistoryNode hn : kustoExecutor.getColumnNodes()) {
+            System.out.println("Found record: " + hn.getName() + " type: " + hn.getDataType() + " value:" + hn.getValue(0, 0));
         }
 
 
@@ -152,7 +142,7 @@ public class KustoTest{
                 appId,
                 appKey,
                 appTenant
-               );
+        );
 
         ClientImpl client = new ClientImpl(csb);
 
@@ -171,7 +161,7 @@ public class KustoTest{
         //clientRequestProperties.setTimeoutInMilliSec(TimeUnit.MINUTES.toMillis(1));
 
         KustoOperationResult queryResults = client.execute(databaseName, queryText
-        //        , clientRequestProperties
+                //        , clientRequestProperties
         );
         KustoResultSetTable mainTableResult = queryResults.getPrimaryResults();
         System.out.println(String.format("Kusto sent back %s rows.", mainTableResult.count()));
@@ -179,7 +169,7 @@ public class KustoTest{
 
         mainTableResult = queryResults.getPrimaryResults();
 
-        while (mainTableResult.next()){
+        while (mainTableResult.next()) {
             String system = mainTableResult.getString("systemName");
             String tagProvider = mainTableResult.getString("tagProvider");
             String tagPath = mainTableResult.getString("tagPath");
@@ -187,22 +177,22 @@ public class KustoTest{
 
             Double value_double = null;
             Integer value_integer = null;
-            if (mainTableResult.getObject("value_double")!= null) {
+            if (mainTableResult.getObject("value_double") != null) {
                 value_double = mainTableResult.getDouble("value_double");
             }
-            if (mainTableResult.getObject("value_integer")!= null) {
+            if (mainTableResult.getObject("value_integer") != null) {
                 value_integer = mainTableResult.getInt("value_integer");
             }
 
             Timestamp timestamp = mainTableResult.getTimestamp("timestamp");
 
             System.out.println(
-                            "System:" + system +
-                            " tagProvider:" +  tagProvider +
-                            " tagPath:" +  tagPath +
-                            " Value:" +  value +
-                            " value_double:" +  value_double +
-                            " value_integer:" +  value_integer +
+                    "System:" + system +
+                            " tagProvider:" + tagProvider +
+                            " tagPath:" + tagPath +
+                            " Value:" + value +
+                            " value_double:" + value_double +
+                            " value_integer:" + value_integer +
                             " timestamp:" + timestamp);
 
             try {

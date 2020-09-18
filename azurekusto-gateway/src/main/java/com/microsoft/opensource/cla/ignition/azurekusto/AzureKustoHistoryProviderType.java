@@ -3,8 +3,8 @@ package com.microsoft.opensource.cla.ignition.azurekusto;
 import com.inductiveautomation.ignition.gateway.localdb.persistence.PersistentRecord;
 import com.inductiveautomation.ignition.gateway.localdb.persistence.RecordMeta;
 import com.inductiveautomation.ignition.gateway.model.GatewayContext;
-import com.inductiveautomation.ignition.gateway.sqltags.config.SQLTagHistoryProviderRecord;
-import com.inductiveautomation.ignition.gateway.sqltags.config.SQLTagHistoryProviderType;
+import com.inductiveautomation.ignition.gateway.sqltags.config.TagHistoryProviderRecord;
+import com.inductiveautomation.ignition.gateway.sqltags.config.TagHistoryProviderType;
 import com.inductiveautomation.ignition.gateway.sqltags.history.TagHistoryProvider;
 
 /**
@@ -12,7 +12,7 @@ import com.inductiveautomation.ignition.gateway.sqltags.history.TagHistoryProvid
  * (TYPE_ID), points to the settings record, and instantiates an instance of
  * the provider with the proper settings.
  */
-public class AzureKustoHistoryProviderType extends SQLTagHistoryProviderType {
+public class AzureKustoHistoryProviderType extends TagHistoryProviderType {
     public static final String TYPE_ID = "AzureKusto";
 
     public AzureKustoHistoryProviderType() {
@@ -28,10 +28,14 @@ public class AzureKustoHistoryProviderType extends SQLTagHistoryProviderType {
      * Creates a new instance of the Azure Kusto history provider for storage and retrieval
      */
     @Override
-    public TagHistoryProvider createHistoryProvider(SQLTagHistoryProviderRecord profile, GatewayContext context)
-            throws Exception {
+    public TagHistoryProvider createHistoryProvider(TagHistoryProviderRecord profile, GatewayContext context) throws Exception {
         AzureKustoHistoryProviderSettings settings = findProfileSettingsRecord(context, profile);
         AzureKustoHistoryProvider ret = new AzureKustoHistoryProvider(context, profile.getName(), settings);
         return ret;
+    }
+
+    @Override
+    public boolean supportsStorage() {
+        return true;
     }
 }

@@ -3,6 +3,7 @@ package com.microsoft.opensource.cla.ignition.azurekusto;
 import com.inductiveautomation.ignition.common.QualifiedPath;
 import com.inductiveautomation.ignition.common.WellKnownPathTypes;
 import com.inductiveautomation.ignition.common.model.values.BasicQualifiedValue;
+import com.inductiveautomation.ignition.common.model.values.QualityCode;
 import com.inductiveautomation.ignition.common.sqltags.model.types.DataQuality;
 import com.inductiveautomation.ignition.common.sqltags.model.types.DataTypeClass;
 import com.inductiveautomation.ignition.gateway.model.GatewayContext;
@@ -76,7 +77,7 @@ public class AzureKustoQueryExecutor implements HistoryQueryExecutor {
 
             if (StringUtils.isBlank(tagPath)) {
                 // We set the data type to Integer here, because if the column is going to be errored, at least integer types won't cause charts to complain.
-                historyTag = new ErrorHistoryColumn(c.getColumnName(), DataTypeClass.Integer, DataQuality.CONFIG_ERROR);
+                historyTag = new ErrorHistoryColumn(c.getColumnName(), DataTypeClass.Integer, QualityCode.Error_Configuration);
                 logger.debug(controller.getQueryId() + ": The item path '" + c.getPath() + "' does not have a valid tag path component.");
             } else {
                 historyTag = new ProcessedHistoryColumn(c.getColumnName(), isRaw);

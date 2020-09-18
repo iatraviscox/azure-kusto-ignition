@@ -32,7 +32,7 @@ public class GatewayHook extends AbstractGatewayModuleHook {
 
         // Add Azure Kusto history provider type
         try {
-            context.getTagManager().addSQLTagHistoryProviderType(azureKustoHistoryProviderType);
+            context.getTagHistoryManager().addTagHistoryProviderType(azureKustoHistoryProviderType);
         } catch (Exception ex) {
             logger.error("Error adding Azure Kusto history provider type", ex);
         }
@@ -50,7 +50,7 @@ public class GatewayHook extends AbstractGatewayModuleHook {
 
         // Remove Azure Kusto history provider type
         try {
-            context.getTagManager().removeSQLTagHistoryProviderType(azureKustoHistoryProviderType);
+            context.getTagHistoryManager().removeTagHistoryProviderType(azureKustoHistoryProviderType);
         } catch (Exception ex) {
             logger.error("Error shutting down Azure Kusto history provider type", ex);
         }

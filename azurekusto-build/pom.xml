@@ -25,7 +25,7 @@
             <plugin>
                 <groupId>com.inductiveautomation.ignitionsdk</groupId>
                 <artifactId>ignition-maven-plugin</artifactId>
-                <version>1.0.12</version>
+                <version>1.1.0</version>
 
                 <executions>
                     <execution>
@@ -47,8 +47,8 @@
                     <moduleId>com.microsoft.opensource.cla.ignition.azurekusto</moduleId>
                     <moduleName>${project.parent.name}</moduleName>
                     <moduleDescription>${project.description}</moduleDescription>
-                    <moduleVersion>1.0.1</moduleVersion>
-                    <requiredIgnitionVersion>7.9.0</requiredIgnitionVersion>
+                    <moduleVersion>2.0.0</moduleVersion>
+                    <requiredIgnitionVersion>8.0.14</requiredIgnitionVersion>
                     <freeModule>true</freeModule>
 
                     <hooks>

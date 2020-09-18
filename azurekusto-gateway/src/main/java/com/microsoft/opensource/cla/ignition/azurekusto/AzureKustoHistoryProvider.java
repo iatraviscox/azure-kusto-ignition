@@ -3,11 +3,11 @@ package com.microsoft.opensource.cla.ignition.azurekusto;
 import com.inductiveautomation.ignition.common.QualifiedPath;
 import com.inductiveautomation.ignition.common.WellKnownPathTypes;
 import com.inductiveautomation.ignition.common.browsing.BrowseFilter;
-import com.inductiveautomation.ignition.common.browsing.BrowseResults;
 import com.inductiveautomation.ignition.common.browsing.Result;
+import com.inductiveautomation.ignition.common.browsing.Results;
 import com.inductiveautomation.ignition.common.browsing.TagResult;
+import com.inductiveautomation.ignition.common.model.values.QualityCode;
 import com.inductiveautomation.ignition.common.sqltags.history.Aggregate;
-import com.inductiveautomation.ignition.common.sqltags.model.types.TagQuality;
 import com.inductiveautomation.ignition.common.util.Timeline;
 import com.inductiveautomation.ignition.common.util.TimelineSet;
 import com.inductiveautomation.ignition.gateway.model.GatewayContext;
@@ -129,11 +129,11 @@ public class AzureKustoHistoryProvider implements TagHistoryProvider {
      * lazy loading, from a specific starting point.
      */
     @Override
-    public BrowseResults<Result> browse(QualifiedPath qualifiedPath, BrowseFilter browseFilter) {
+    public Results<Result> browse(QualifiedPath qualifiedPath, BrowseFilter browseFilter) {
         logger.debug("browse(qualifiedPath, browseFilter) called.  qualifiedPath: " + qualifiedPath.toString()
                 + ", browseFilter: " + (browseFilter == null ? "null" : browseFilter.toString()));
 
-        BrowseResults<Result> result = new BrowseResults<>();
+        Results<Result> result = new Results<>();
         ArrayList<Result> list = new ArrayList<>();
 
         // First, we need to find the starting point based on history provider, system name, tag provider, and tag path
@@ -203,7 +203,7 @@ public class AzureKustoHistoryProvider implements TagHistoryProvider {
 
         result.setResults(list);
         result.setTotalAvailableResults(list.size());
-        result.setResultQuality(TagQuality.GOOD);
+        result.setResultQuality(QualityCode.Good);
         return result;
     }
 

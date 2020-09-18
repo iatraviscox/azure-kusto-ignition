@@ -1,7 +1,7 @@
 package com.microsoft.opensource.cla.ignition.azurekusto;
 
 import com.inductiveautomation.ignition.gateway.localdb.persistence.*;
-import com.inductiveautomation.ignition.gateway.sqltags.config.SQLTagHistoryProviderRecord;
+import com.inductiveautomation.ignition.gateway.sqltags.config.TagHistoryProviderRecord;
 import simpleorm.dataset.SFieldFlags;
 
 /**
@@ -14,8 +14,8 @@ public class AzureKustoHistoryProviderSettings extends PersistentRecord {
             AzureKustoHistoryProviderSettings.class, "AzureKustoHistoryProviderSettings");
 
     public static final LongField ProfileId = new LongField(META, "ProfileId", SFieldFlags.SPRIMARY_KEY);
-    public static final ReferenceField<SQLTagHistoryProviderRecord> Profile =
-            new ReferenceField<SQLTagHistoryProviderRecord>(META, SQLTagHistoryProviderRecord.META, "Profile", ProfileId);
+    public static final ReferenceField<TagHistoryProviderRecord> Profile =
+            new ReferenceField<TagHistoryProviderRecord>(META, TagHistoryProviderRecord.META, "Profile", ProfileId);
 
     public static final StringField ApplicationId = new StringField(META, "ApplicationId", SFieldFlags.SMANDATORY);
     public static final StringField AADTenantId = new StringField(META, "AADTenantId", SFieldFlags.SMANDATORY);

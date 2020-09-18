@@ -13,7 +13,7 @@
     <description>The Azure Kusto Ignition module provides easy integration between Ignition and Azure Data Explorer.</description>
 
     <properties>
-        <ignition-sdk-version>7.9.12</ignition-sdk-version>
+        <ignition-sdk-version>8.0.14</ignition-sdk-version>
         <kusto-sdk-version>2.1.1</kusto-sdk-version>
     </properties>
 
