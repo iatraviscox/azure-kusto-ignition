@@ -15,7 +15,19 @@
     <dependencies>
         <dependency>
             <groupId>com.microsoft.opensource.cla.ignition</groupId>
+            <artifactId>azurekusto-common</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.microsoft.opensource.cla.ignition</groupId>
             <artifactId>azurekusto-gateway</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.microsoft.opensource.cla.ignition</groupId>
+            <artifactId>azurekusto-designer</artifactId>
             <version>1.0.0</version>
         </dependency>
     </dependencies>
@@ -39,8 +51,16 @@
                 <configuration>
                     <projectScopes>
                         <projectScope>
+                            <name>azurekusto-common</name>
+                            <scope>C</scope>
+                        </projectScope>
+                        <projectScope>
                             <name>azurekusto-gateway</name>
                             <scope>G</scope>
+                        </projectScope>
+                        <projectScope>
+                            <name>azurekusto-designer</name>
+                            <scope>D</scope>
                         </projectScope>
                     </projectScopes>
 
@@ -51,10 +71,25 @@
                     <requiredIgnitionVersion>8.0.14</requiredIgnitionVersion>
                     <freeModule>true</freeModule>
 
+                    <depends>
+                        <depend>
+                            <scope>G</scope>
+                            <moduleId>com.inductiveautomation.perspective</moduleId>
+                        </depend>
+                        <depend>
+                            <scope>D</scope>
+                            <moduleId>com.inductiveautomation.perspective</moduleId>
+                        </depend>
+                    </depends>
+
                     <hooks>
                         <hook>
                             <scope>G</scope>
                             <hookClass>com.microsoft.opensource.cla.ignition.GatewayHook</hookClass>
+                        </hook>
+                        <hook>
+                            <scope>D</scope>
+                            <hookClass>com.microsoft.opensource.cla.ignition.DesignerHook</hookClass>
                         </hook>
                     </hooks>
 

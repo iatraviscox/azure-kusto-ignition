@@ -16,15 +16,12 @@ import com.inductiveautomation.ignition.gateway.sqltags.history.TagHistoryProvid
 import com.inductiveautomation.ignition.gateway.sqltags.history.TagHistoryProviderInformation;
 import com.inductiveautomation.ignition.gateway.sqltags.history.query.ColumnQueryDefinition;
 import com.inductiveautomation.ignition.gateway.sqltags.history.query.QueryController;
-import com.microsoft.azure.kusto.data.ClientImpl;
-import com.microsoft.azure.kusto.data.ConnectionStringBuilder;
 import com.microsoft.azure.kusto.data.KustoOperationResult;
 import com.microsoft.azure.kusto.data.KustoResultSetTable;
 import com.microsoft.opensource.cla.ignition.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URISyntaxException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,12 +40,13 @@ public class AzureKustoHistoryProvider implements TagHistoryProvider {
     private GatewayContext context;
     private AzureKustoHistoryProviderSettings settings;
     private AzureKustoHistorySink sink;
-    private ClientImpl kustoQueryClient; // A client for querying data
+    private AzureKustoConnection connection;
 
     public AzureKustoHistoryProvider(GatewayContext context, String name, AzureKustoHistoryProviderSettings settings) {
         this.name = name;
         this.context = context;
         this.settings = settings;
+        this.connection = new AzureKustoConnection(settings);
     }
 
     @Override
@@ -57,30 +55,9 @@ public class AzureKustoHistoryProvider implements TagHistoryProvider {
             // Create a new data sink with the same name as the provider to store data
             sink = new AzureKustoHistorySink(name, context, settings);
             context.getHistoryManager().registerSink(sink);
-
-            // Create a Kusto client
-            ConnectToKusto();
-
         } catch (Throwable e) {
             logger.error("Error registering Azure Kusto history sink", e);
         }
-    }
-
-    public void ConnectToKusto() throws URISyntaxException {
-        String clusterURL = settings.getClusterURL();
-        String applicationId = settings.getString(AzureKustoHistoryProviderSettings.ApplicationId);
-        String applicationKey = settings.getString(AzureKustoHistoryProviderSettings.ApplicationKey);
-        String aadTenantId = settings.getString(AzureKustoHistoryProviderSettings.AADTenantId);
-
-        ConnectionStringBuilder connectionString;
-
-        connectionString = ConnectionStringBuilder.createWithAadApplicationCredentials(
-                clusterURL,
-                applicationId,
-                applicationKey,
-                aadTenantId);
-
-        kustoQueryClient = new ClientImpl(connectionString);
     }
 
     @Override
@@ -148,7 +125,7 @@ public class AzureKustoHistoryProvider implements TagHistoryProvider {
         }
         String tagPath = qualifiedPath.getPathComponent(WellKnownPathTypes.Tag);
 
-        String query = settings.getEventsTableName();
+        String query = connection.getTable();
         if (systemName == null) {
             query += " | distinct systemName, tagProvider, tagPath";
             query += " | summarize countChildren = dcount(tagPath) by systemName, tagProvider";
@@ -173,7 +150,7 @@ public class AzureKustoHistoryProvider implements TagHistoryProvider {
         logger.debug("Issuing query:" + query);
 
         try {
-            KustoOperationResult results = kustoQueryClient.execute(settings.getDatabaseName(), query);
+            KustoOperationResult results = connection.runQuery(query);
             KustoResultSetTable mainTableResult = results.getPrimaryResults();
 
             while (mainTableResult.next()) {
@@ -220,7 +197,7 @@ public class AzureKustoHistoryProvider implements TagHistoryProvider {
 
         String queryPrefix = "let startTime = " + Utils.getDateLiteral(startDate) + ";\n" +
                 "let endTime = " + Utils.getDateLiteral(endDate) + ";\n";
-        String queryData = settings.getEventsTableName() + "| where timestamp between(startTime..endTime) ";
+        String queryData = connection.getTable() + "| where timestamp between(startTime..endTime) ";
 
         queryData += "| where ";
         QualifiedPath[] tagKeys = tags.toArray(new QualifiedPath[]{});
@@ -246,7 +223,7 @@ public class AzureKustoHistoryProvider implements TagHistoryProvider {
         String query = queryPrefix + queryData + querySuffix;
         logger.debug("Issuing query:" + query);
 
-        KustoOperationResult results = kustoQueryClient.execute(settings.getDatabaseName(), query);
+        KustoOperationResult results = connection.runQuery(query);
         KustoResultSetTable mainTableResult = results.getPrimaryResults();
 
         while (mainTableResult.next()) {

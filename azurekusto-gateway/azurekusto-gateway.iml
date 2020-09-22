@@ -13,6 +13,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.9.10.5" level="project" />
     <orderEntry type="library" name="Maven: com.nimbusds:nimbus-jose-jwt:8.19" level="project" />
+    <orderEntry type="module" module-name="azurekusto-common" />
     <orderEntry type="library" name="Maven: com.microsoft.azure.kusto:kusto-ingest:2.1.1" level="project" />
     <orderEntry type="library" name="Maven: com.microsoft.azure:azure-storage:8.3.0" level="project" />
     <orderEntry type="library" name="Maven: com.microsoft.azure:azure-keyvault-core:1.0.0" level="project" />
@@ -88,5 +89,8 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.googlecode.wicket-jquery-ui:jquery-ui-core:6.1.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.squareup:tape:1.2.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-fileupload:commons-fileupload:1.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.inductiveautomation.perspective:perspective-gateway:1.0.14" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.inductiveautomation.perspective:perspective-common:1.0.14" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.inductiveautomation.perspective:perspective-themes:1.0.14" level="project" />
   </component>
 </module>

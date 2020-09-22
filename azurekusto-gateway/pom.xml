@@ -20,6 +20,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.microsoft.opensource.cla.ignition</groupId>
+            <artifactId>azurekusto-common</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.microsoft.azure.kusto</groupId>
             <artifactId>kusto-ingest</artifactId>
             <version>${kusto-sdk-version}</version>
@@ -50,6 +56,14 @@
         <dependency>
             <groupId>com.inductiveautomation.ignitionsdk</groupId>
             <artifactId>gateway-api</artifactId>
+            <version>${ignition-sdk-version}</version>
+            <type>pom</type>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.inductiveautomation.ignitionsdk</groupId>
+            <artifactId>perspective-gateway</artifactId>
             <version>${ignition-sdk-version}</version>
             <type>pom</type>
             <scope>provided</scope>

@@ -19,7 +19,9 @@
 
     <modules>
         <module>azurekusto-build</module>
+        <module>azurekusto-common</module>
         <module>azurekusto-gateway</module>
+        <module>azurekusto-designer</module>
     </modules>
 
     <pluginRepositories>

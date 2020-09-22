@@ -5,18 +5,10 @@ import com.inductiveautomation.ignition.common.StatMetric;
 import com.inductiveautomation.ignition.common.i18n.LocalizedString;
 import com.inductiveautomation.ignition.gateway.history.*;
 import com.inductiveautomation.ignition.gateway.model.GatewayContext;
-import com.microsoft.azure.kusto.data.ClientImpl;
-import com.microsoft.azure.kusto.data.ConnectionStringBuilder;
-import com.microsoft.azure.kusto.data.KustoOperationResult;
-import com.microsoft.azure.kusto.ingest.IngestClient;
-import com.microsoft.azure.kusto.ingest.IngestClientFactory;
-import com.microsoft.azure.kusto.ingest.IngestionProperties;
-import com.microsoft.azure.kusto.ingest.StreamingIngestClient;
 import com.microsoft.azure.kusto.ingest.exceptions.IngestionClientException;
 import com.microsoft.azure.kusto.ingest.exceptions.IngestionServiceException;
 import com.microsoft.azure.kusto.ingest.source.CompressionType;
 import com.microsoft.azure.kusto.ingest.source.StreamSourceInfo;
-import com.microsoft.opensource.cla.ignition.Utils;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import org.slf4j.Logger;
@@ -26,7 +18,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,21 +31,15 @@ import java.util.zip.GZIPOutputStream;
  */
 public class AzureKustoHistorySink implements DataSink {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private AzureKustoHistoryProviderSettings settings; // Holds the settings for the current provider, needed to connect to ADX
     private GatewayContext context;
     private String pipelineName;
-    private StreamingIngestClient streamingIngestClient;
-    private IngestClient queuedClient;
-    private String table;
-    private String database;
+    private AzureKustoConnection connection;
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSSS");
-
-    private IngestionProperties ingestionProperties;
 
     public AzureKustoHistorySink(String pipelineName, GatewayContext context, AzureKustoHistoryProviderSettings settings) {
         this.pipelineName = pipelineName;
         this.context = context;
-        this.settings = settings;
+        this.connection = new AzureKustoConnection(settings);
     }
 
     @Override
@@ -64,45 +49,7 @@ public class AzureKustoHistorySink implements DataSink {
 
     @Override
     public void startup() {
-        String clusterURL = settings.getString(AzureKustoHistoryProviderSettings.ClusterURL);
-        String applicationId = settings.getString(AzureKustoHistoryProviderSettings.ApplicationId);
-        String applicationKey = settings.getString(AzureKustoHistoryProviderSettings.ApplicationKey);
-        String aadTenantId = settings.getString(AzureKustoHistoryProviderSettings.AADTenantId);
-        database = settings.getString(AzureKustoHistoryProviderSettings.DatabaseName);
-
-        String dmUrl = Utils.getDMUriFromSetting(clusterURL);
-        String engineURL = Utils.getEngineUriFromSetting(clusterURL);
-
-        ConnectionStringBuilder connectionString = ConnectionStringBuilder.createWithAadApplicationCredentials(
-                engineURL,
-                applicationId,
-                applicationKey,
-                aadTenantId);
-        ConnectionStringBuilder DmConnectionString = ConnectionStringBuilder.createWithAadApplicationCredentials(
-                dmUrl,
-                applicationId,
-                applicationKey,
-                aadTenantId);
-        try {
-            ClientImpl client = new ClientImpl(connectionString);
-
-            try {
-                KustoOperationResult result = client.execute(database, ".show table " + table);
-            } catch (Throwable ex) {
-                try {
-                    client.execute(database, ".create table " + table + " ( systemName:string, tagProvider:string, tagPath:string, value:dynamic, value_double:real, value_integer:int, timestamp:datetime, quality:int)");
-                } catch (Throwable ex2) {
-                    logger.error("Error creating table '" + table + "'", ex2);
-                }
-            }
-            streamingIngestClient = IngestClientFactory.createStreamingIngestClient(connectionString);
-            queuedClient = IngestClientFactory.createClient(DmConnectionString);
-            table = settings.getEventsTableName();
-            ingestionProperties = new IngestionProperties(database, table);
-            ingestionProperties.setDataFormat(IngestionProperties.DATA_FORMAT.csv);
-        } catch (URISyntaxException ex) {
-            logger.error("Error on AzureKustoHistorySink startup ", ex);
-        }
+        connection.verifyTable();
     }
 
     @Override
@@ -210,7 +157,7 @@ public class AzureKustoHistorySink implements DataSink {
         gzipOutputStream.finish();
         gzipOutputStream.close();
         // Can change here to streaming
-        queuedClient.ingestFromStream(streamSourceInfo, ingestionProperties);
+        connection.ingestFromStream(streamSourceInfo);
     }
 
     @Override

@@ -4,7 +4,6 @@ import com.inductiveautomation.ignition.common.QualifiedPath;
 import com.inductiveautomation.ignition.common.WellKnownPathTypes;
 import com.inductiveautomation.ignition.common.model.values.BasicQualifiedValue;
 import com.inductiveautomation.ignition.common.model.values.QualityCode;
-import com.inductiveautomation.ignition.common.sqltags.model.types.DataQuality;
 import com.inductiveautomation.ignition.common.sqltags.model.types.DataTypeClass;
 import com.inductiveautomation.ignition.gateway.model.GatewayContext;
 import com.inductiveautomation.ignition.gateway.sqltags.history.query.ColumnQueryDefinition;
@@ -13,8 +12,6 @@ import com.inductiveautomation.ignition.gateway.sqltags.history.query.HistoryQue
 import com.inductiveautomation.ignition.gateway.sqltags.history.query.QueryController;
 import com.inductiveautomation.ignition.gateway.sqltags.history.query.columns.ErrorHistoryColumn;
 import com.inductiveautomation.ignition.gateway.sqltags.history.query.columns.ProcessedHistoryColumn;
-import com.microsoft.azure.kusto.data.ClientImpl;
-import com.microsoft.azure.kusto.data.ConnectionStringBuilder;
 import com.microsoft.azure.kusto.data.KustoOperationResult;
 import com.microsoft.azure.kusto.data.KustoResultSetTable;
 import com.microsoft.opensource.cla.ignition.Utils;
@@ -35,20 +32,17 @@ public class AzureKustoQueryExecutor implements HistoryQueryExecutor {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private GatewayContext context;
-    private AzureKustoHistoryProviderSettings settings; // Holds the settings for the current provider, needed to connect to ADX
     private QueryController controller; // Holds the settings for what the user wants to query
     private List<ColumnQueryDefinition> tagDefs; // Holds the definition of each tag
     private Map<AzureKustoTag, AzureKustoHistoryTag> tags; // The list of tags to return with data
-
-    private ConnectionStringBuilder connectionString;
-    private ClientImpl kustoQueryClient; // A client for querying data
+    private AzureKustoConnection connection;
 
     boolean processed = false;
     long maxTSInData = -1;
 
     public AzureKustoQueryExecutor(GatewayContext context, AzureKustoHistoryProviderSettings settings, List<ColumnQueryDefinition> tagDefs, QueryController controller) {
         this.context = context;
-        this.settings = settings;
+        this.connection = new AzureKustoConnection(settings);
         this.controller = controller;
         this.tagDefs = tagDefs;
         this.tags = new HashMap<>();
@@ -106,18 +100,7 @@ public class AzureKustoQueryExecutor implements HistoryQueryExecutor {
      */
     @Override
     public void initialize() throws Exception {
-        String clusterURL = settings.getClusterURL();
-        String applicationId = settings.getString(AzureKustoHistoryProviderSettings.ApplicationId);
-        String applicationKey = settings.getString(AzureKustoHistoryProviderSettings.ApplicationKey);
-        String aadTenantId = settings.getString(AzureKustoHistoryProviderSettings.AADTenantId);
 
-        connectionString = ConnectionStringBuilder.createWithAadApplicationCredentials(
-                clusterURL,
-                applicationId,
-                applicationKey,
-                aadTenantId);
-
-        kustoQueryClient = new ClientImpl(connectionString);
     }
 
     @Override
@@ -142,7 +125,7 @@ public class AzureKustoQueryExecutor implements HistoryQueryExecutor {
                 "let blocks = " + blockSize + ";\n" +
                         "let startTime = " + Utils.getDateLiteral(startDate) + ";\n" +
                         "let endTime = " + Utils.getDateLiteral(endDate) + ";\n";
-        String queryData = settings.getEventsTableName() + "| where timestamp between(startTime..endTime) ";
+        String queryData = connection.getTable() + "| where timestamp between(startTime..endTime) ";
 
         queryData += "| where ";
         AzureKustoTag[] tagKeys = tags.keySet().toArray(new AzureKustoTag[]{});
@@ -166,7 +149,7 @@ public class AzureKustoQueryExecutor implements HistoryQueryExecutor {
         String query = queryPrefix + queryData + querySuffix;
         logger.debug("Issuing query:" + query);
 
-        KustoOperationResult results = kustoQueryClient.execute(settings.getDatabaseName(), query);
+        KustoOperationResult results = connection.runQuery(query);
         KustoResultSetTable mainTableResult = results.getPrimaryResults();
 
         while (mainTableResult.next()) {

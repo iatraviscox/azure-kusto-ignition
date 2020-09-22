@@ -71,8 +71,6 @@ public class KustoTest {
 
         AzureKustoHistoryProvider provider = new AzureKustoHistoryProvider(null, "ADX", settings);
 
-        provider.ConnectToKusto();
-
         BrowseFilter browseFilter = new BrowseFilter();
 
         Results<Result> browsResults = null;
