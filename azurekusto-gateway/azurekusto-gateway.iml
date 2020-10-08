@@ -14,6 +14,14 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.9.10.5" level="project" />
     <orderEntry type="library" name="Maven: com.nimbusds:nimbus-jose-jwt:8.19" level="project" />
     <orderEntry type="module" module-name="azurekusto-common" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.inductiveautomation.ignition:gateway-api:8.0.14" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.inductiveautomation.ignition:simple-orm:8.0.14" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.inductiveautomation.ignition:metro:8.0.14" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.google.protobuf:protobuf-java:3.8.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: commons-fileupload:commons-fileupload:1.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.inductiveautomation.perspective:perspective-gateway:1.0.14" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.inductiveautomation.perspective:perspective-themes:1.0.14" level="project" />
+    <orderEntry type="module" module-name="azurekusto-common" />
     <orderEntry type="library" name="Maven: com.microsoft.azure.kusto:kusto-ingest:2.1.1" level="project" />
     <orderEntry type="library" name="Maven: com.microsoft.azure:azure-storage:8.3.0" level="project" />
     <orderEntry type="library" name="Maven: com.microsoft.azure:azure-keyvault-core:1.0.0" level="project" />

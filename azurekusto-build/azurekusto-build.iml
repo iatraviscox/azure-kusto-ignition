@@ -11,6 +11,8 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.9.10.5" level="project" />
     <orderEntry type="library" name="Maven: com.nimbusds:nimbus-jose-jwt:8.19" level="project" />
     <orderEntry type="module" module-name="azurekusto-common" />
+    <orderEntry type="module" module-name="azurekusto-designer" />
+    <orderEntry type="module" module-name="azurekusto-common" />
     <orderEntry type="module" module-name="azurekusto-gateway" />
     <orderEntry type="library" name="Maven: com.microsoft.azure.kusto:kusto-ingest:2.1.1" level="project" />
     <orderEntry type="library" name="Maven: com.microsoft.azure:azure-storage:8.3.0" level="project" />
